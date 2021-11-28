@@ -73,10 +73,13 @@ Delitos_todos = Delitos_todos[Delitos_todos$COMUNA %in% Delitos2010$COMUNA,]
 
 ##### TOTAL 38 COMUNAS.
 
+
+
 # dir.create("Datos_limpios")
-# write.csv(Delitos_todos, file= "Datos_limpios/Delitos_todos_38com.csv")
-write.csv(Densidad_2017, file= "Datos_limpios/Densidad_2017.csv")
-write.csv(Densidad_Viviendas_2016, file= "Datos_limpios/Densidad_2016.csv")
+
+# write.csv(Delitos_todos, file= "Datos_limpios/Delitos_todos_38com.csv", fileEncoding = "UTF-8")
+# write.csv(Densidad_2017, file= "Datos_limpios/Densidad_2017.csv", fileEncoding = "UTF-8")
+# write.csv(Densidad_Viviendas_2016, file= "Datos_limpios/Densidad_2016.csv", fileEncoding = "UTF-8")
 
 
 
