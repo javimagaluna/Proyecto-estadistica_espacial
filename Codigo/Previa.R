@@ -84,13 +84,67 @@ ggplot(Delitos_RM %>%
   theme_void()
 
 
-# Otra opción
+# Otra opción más "bonita"
 Delitos2010 <- Delitos_RM %>% 
   filter(ANIO =="2010")
 
-mapview::mapview(Delitos2010["VIO.ADULT"])
-mapview::mapview(Delitos2010["VIO.MUJ"])
-mapview::mapview(Delitos2010["VIO.NIN"])
-mapview::mapview(Delitos2010["ALCOHOL"])
-mapview::mapview(Delitos2010["ABUSO"])
-mapview::mapview(Delitos2010["RUIDO"])
+mapview::mapview(Delitos2010["VIO.ADULT"],
+                 layer.name = "Delito Viol. Contra Adult. Mayor",
+                 legend = TRUE,
+                 popup = paste0(
+                   "<b>COMUNA: </b>"
+                   , Delitos2010$COMUNA
+                   , "<br><b>Delitos: </b>"
+                   , Delitos2010$VIO.ADULT
+                 ))
+mapview::mapview(Delitos2010["VIO.MUJ"],
+                 layer.name = "Delito Viol. Contra Mujer",
+                 legend = TRUE,
+                 popup = paste0(
+                   "<b>COMUNA: </b>"
+                   , Delitos2010$COMUNA
+                   , "<br><b>Delitos: </b>"
+                   , Delitos2010$VIO.MUJ
+                 ))
+
+# Este se me queda pegado con la Ñ
+mapview::mapview(Delitos2010["VIO.NIN"],
+                 layer.name = "Delito Viol. Contra Nino",
+                 legend = TRUE,
+                 popup = paste0(
+                   "<b>COMUNA: </b>"
+                   , Delitos2010$COMUNA
+                   , "<br><b>Delitos: </b>"
+                   , Delitos2010$VIO.NIN
+                 ))
+
+# Se pega con tildes también 
+mapview::mapview(Delitos2010["ALCOHOL"],
+                 layer.name = "Delito Alcohol Via Publica",
+                 legend = TRUE,
+                 popup = paste0(
+                   "<b>COMUNA: </b>"
+                   , Delitos2010$COMUNA
+                   , "<br><b>Delitos: </b>"
+                   , Delitos2010$ALCOHOL
+                 ))
+
+mapview::mapview(Delitos2010["ABUSO"],
+                 layer.name = "Delito Abuso Sexual",
+                 legend = TRUE,
+                 popup = paste0(
+                   "<b>COMUNA: </b>"
+                   , Delitos2010$COMUNA
+                   , "<br><b>Delitos: </b>"
+                   , Delitos2010$ABUSO
+                 ))
+
+mapview::mapview(Delitos2010["RUIDO"],
+                 layer.name = "Delito Ruidos Molestos",
+                 legend = TRUE,
+                 popup = paste0(
+                   "<b>COMUNA: </b>"
+                   , Delitos2010$COMUNA
+                   , "<br><b>Delitos: </b>"
+                   , Delitos2010$RUIDO
+                 ))
