@@ -11,48 +11,66 @@ library(tmap)
 
 # Bases -------------------------------------------------------------------
 library(readr)
-Delitos_todos <- read_csv("Datos_limpios/Delitos_todos_38com.csv", 
-                          col_types = cols(X1 = col_skip()))
-
-
-Densidad_2016 <- read_csv("Datos_limpios/Densidad_2016.csv", 
-                          col_types = cols(X1 = col_skip()))
-
 
 Densidad_2017 <- read_csv("Datos_limpios/Densidad_2017.csv", 
                           col_types = cols(X1 = col_skip()))
 
+#---------
+
+# Agrupando datos por comuna
+D2017 <- Densidad_2017 %>% 
+  rename(Comuna = COMUNA) %>% 
+  group_by(Comuna) %>% 
+  summarise( Superficie_Ha = sum(Sup_Ha),
+            Densidad_Viv = sum(Den_Viv),
+            Total_Viv = sum(TOTAL_VIVI))
+
+# Cargo sf de las comunas
+Chile <- sf::st_read("Datos/Comunas","comunas")
+
+# Selecciono solo los de la RM
+RM <- Chile %>% 
+  dplyr::filter(Region == "Región Metropolitana de Santiago")
 
 
-# Analisis exploratorio ---------------------------------------------------
+# filtrando comunas de ambas bases
+D2017_sf <- RM[tolower(RM$Comuna) %in% D2017$Comuna, ]
 
-Delitos_todos %>% 
-  group_by(ANIO) %>%
-  ggplot( aes(ANIO, VIO.MUJ, group= COMUNA, col= COMUNA))+
-  geom_line()
+# para join
+D2017_sf$Comuna <- tolower(D2017_sf$Comuna)
 
-# xd
+# Uniendo
+D2017_sf <- D2017_sf %>% left_join(D2017)
 
-## Comunas con mas denuncias:
-
-glimpse(Delitos_todos)
-
-Delitos_todos = Delitos_todos %>% 
-  mutate(Total = apply(Delitos_todos[, c(2:7)], 1, FUN = sum))
+D2017_sf %>% names()
 
 
-###################################
+## Graficos---
 
-Densidad2017_sf <- sf::st_read("Datos/Indicadores_Territoriales.geojson")
+ggplot(D2017_sf) +
+  geom_sf(aes(fill = Densidad_Viv)) +
+  scale_fill_viridis_c(option = "plasma") +
+  labs(title = "Densidad de viviendas") +
+  theme_minimal()
 
-Densidad2016_sf <- sf::st_read("Datos/Densidad_Viviendas_Santiago_2016.geojson")
+# ke?
 
-class(Densidad2017_sf)
+ggplot(D2017_sf) +
+  geom_sf(aes(fill = Superficie_Ha)) +
+  scale_fill_viridis_c(option = "plasma") +
+  labs(title = "Superficie de manzana en hectáreas") +
+  theme_minimal()
 
-tmap_leaflet(tm_shape(Densidad2017_sf)+
-  tm_dots(c("Den_Viv"),
-          palette= "plasma"))
+ggplot(D2017_sf) +
+  geom_sf(aes(fill = Total_Viv)) +
+  scale_fill_viridis_c(option = "plasma") +
+  labs(title = "Total viviendas")+
+  theme_minimal()
 
 
-ggplot(data = Densidad2017_sf) +
-  geom_sf(aes(fill = COMUNA))
+
+
+
+
+
+
