@@ -177,3 +177,28 @@ grid()
 
 
 
+# Correlaciones entre Densidad y delitos ----------------------------------
+
+## Corr densidades
+psych::pairs.panels(D2016[,-1], main= "Correlación para densidades 2016", pch=20)
+psych::pairs.panels(D2017[, -1], main= "Correlación para densidades 2017", pch=20)
+
+# Correlación alta, como era de esperarse.
+
+## Corr delitos
+Delitos <- readxl::read_excel("Datos/Delitos_todos.xlsx")
+psych::pairs.panels(Delitos[, c(-1,-8)], pch=20)
+
+# o:
+
+## Corr total de viviendas y delitos:
+Delitos_2016 <- Delitos %>%
+  filter(ANIO == 2016) %>%
+  rename(Comuna= COMUNA)
+                   
+Delitos_2016$Comuna <- toupper(Delitos_2016$Comuna)
+
+Delitos_2016 = Delitos_2016 %>% left_join(D2016)
+
+psych::pairs.panels(Delitos_2016[, c(-1,-8, -9, -10)], pch=20)
+
