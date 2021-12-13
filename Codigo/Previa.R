@@ -58,7 +58,7 @@ ggplot(Delitos_RM %>%
          filter(ANIO == "2017")) +
   geom_sf(aes(fill = ALCOHOL)) +
   scale_fill_viridis_c(option = "plasma") +
-  labs(title = "Frecuencia Delito Alcohol Vía Pública 2011") +
+  labs(title = "Frecuencia Delito Alcohol Vía Pública 2017") +
   theme_void()
 
 # Delito Violencia Adulto Mayor
@@ -148,3 +148,32 @@ mapview::mapview(Delitos2010["RUIDO"],
                    , "<br><b>Delitos: </b>"
                    , Delitos2010$RUIDO
                  ))
+
+# transformando sf a sp
+sp_Delitos2010 <- as(Delitos2010, "Spatial")
+
+
+
+tmap_leaflet(tm_shape(sp_Delitos2010) +
+               tm_polygons(c("ABUSO", "ALCOHOL"),
+                       palette= "plasma"))
+
+
+# No se por qué el circulo rojo se pone detrás del mapa :c
+tmap_mode("view")
+tm_shape(sp_Delitos2010) +
+  tm_polygons(c("ABUSO", "ALCOHOL"), id= "COMUNA",
+              palette= "plasma") + 
+  tm_facets(sync = TRUE, ncol = 2)
+
+
+## GIF
+animacion <- tm_shape(Delitos_RM) +
+  tm_polygons("ABUSO", style = "cont",
+              id = "COMUNA",
+              palette= "plasma") + 
+  tm_facets(along = "ANIO")
+
+tmap_animation(animacion, delay = 70) # , filename = "nombre.gif"
+
+
