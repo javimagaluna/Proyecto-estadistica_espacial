@@ -174,6 +174,7 @@ data.frame(Variable= c("Hacinamiento", "Pob_Viv", "MASCU", "ESC") , Moran_I_stat
 
 De las tablas I y II, podemos desprender que para todas nuestras variables existe autocorrelación espacial. 
 
+----
 Ahora en cuanto a las variables de delitos, veremos una a una si existe algún tipo de autocorrelación espacial.
 
 ### Violencia hacia la Mujer
@@ -491,11 +492,12 @@ RUIDO %>%
 
 Podemos ver en la tabla VIII que la variable `RUIDO` no presenta autocorrelación espacial en ninguno de los años observados.
 
+----
 ## Modelos
 
 ### Modelo Violencia Adulto Mayor
 
-Se propuso el modelo completo con las variables comunales HACI, MASCU, ESCU y Pob_Viv. Y luego se fueron eliminando variables teniendo presente la significancia que tenían en el modelo completo y usando como criterio de eliminación el AIC.
+Se propuso el modelo completo con las variables comunales HACI, MASCU, ESCU y Pob_Viv. Luego se fueron eliminando variables teniendo presente la significancia que tenían en el modelo completo y usando como criterio de eliminación el AIC.
 
 ```{r warning= FALSE, message=FALSE, echo=FALSE}
 # Defino los vecinos
@@ -541,6 +543,21 @@ AIC_ADULT %>%
 ```
 
 Para el delito de violencia hacia adulto mayor el mejor modelo es el CAR con las variables MASCU y ESC. Por lo que no estaría incidiendo en este delito los niveles de hacinamiento o la cantidad de habitantes por vivienda. Pero sí la cantidad de hombres en la comuna y el nivel de escolaridad de los jefes o jefas de hogar.
+
+----
+
+Ahora veamos la correlación de los datos a traves de un corrplot ¿Qué tan relacionadas linealmente estarán nuestras variables?
+
+```{r , fig.align="center", fig.cap= "Figura 2: Corrplot"}
+
+knitr::include_graphics(here::here("Informe","Corrplot.png"))
+
+```
+
+De la Figura 2, podemos notar que las variables `POB`,`VIV`, `ABUSO`, `VIO.MUJ` y `VIO.NIN` poseen una asociación muy alta. Podriamos decir que a medida que hay mayor población o viviendas, encontraremos una mayor cantidad de denuncias con respecto a la violencia y abuso.
+
+
+
 
 # Conclusión
 
