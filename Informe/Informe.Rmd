@@ -796,6 +796,9 @@ Para el delito de ruidos molestos el mejor modelo es el CAR con la variable MASC
 
 # Conclusión
 
+Inclusive en los delitos que no se apreciaba autocorrelación espacial podemos notar que el 
+modelo CAR modela mejor. Esto probablemente debido a que las variables comunales que componen la variable respuesta delito sí tendrían autocorrelación espacial.
+
 Tabla XV: Resumen incidencia de las variable comunales sobre los distintos delitos.
 
 |Modelo|Hacinamiento|Masculinidad|Escolaridad|Pob_Viv|
