@@ -7,7 +7,6 @@ title: |
 author: |
   - Paula Muñoz Parada
   - Javiera Preuss Araya
-
 output:
   rmdformats::material:
     highlight: kate
@@ -21,7 +20,6 @@ library(knitr)
 library(rmdformats)
 library(here)
 library(kableExtra)
-
 ```
 
 # Resumen
@@ -83,7 +81,6 @@ Será necesario poner librerias???
 
 ```{r echo = FALSE, warning= FALSE, message=FALSE, include=FALSE}
 # Librerías ---------------------------------------------------------------
-
 library(dplyr)
 library(gstat)
 library(sp)
@@ -94,54 +91,36 @@ library(readr)
 library(readxl)
 library(spdep)
 library(spatialreg)
-
-
-
 # Bases -------------------------------------------------------------------
-
 D2017 <- readxl::read_excel("Datos/Pob2017.xlsx")
-
 # Cargo sf de las comunas
 Chile <- sf::st_read("Datos/Comunas","comunas")
-
 # Selecciono solo los de la RM
 RM <- Chile %>% 
   dplyr::filter(Region == "Región Metropolitana de Santiago")
-
 # Dejo con el mismo nombre la columna
 RM <- RM %>% 
   rename(COMUNA = Comuna)
-
 # Entrecruzo
 D2017 <- RM %>% 
   left_join(D2017)
-
 # Cantidad de habitantes por vivienda
 D2017 <- D2017 %>% 
   mutate(Pob_Viv = POB/VIV)
-
 # Base delitos
-
 Del <- readxl::read_excel("Datos/Delitos_todos.xlsx")
-
 # Arreglar el nombre de la comuna
 Del$COMUNA[Del$COMUNA == "Caracaví"] <- "Curacaví"
-
 D2017_Del <- D2017 %>% 
   mutate(COMUNA = tolower(D2017$COMUNA))
-
 D2017_Del <- D2017 %>% 
   left_join(Del)
-
 # Autocorrelación ---------------------------------------------------------
-
 # Defino los vecinos
 vecinos <- poly2nb(D2017)
-
 # Hago las matrices de pesos
 b_pesos <- nb2listw(vecinos, style ="B", zero.policy = TRUE)
 w_pesos <- nb2listw(vecinos, style ="W", zero.policy = TRUE)
-
 ver_b_pesos <- listw2mat(b_pesos)
 ver_w_pesos <- listw2mat(w_pesos)
 ```
@@ -153,15 +132,11 @@ ver_w_pesos <- listw2mat(w_pesos)
 Para tener una panorámica de la situación, observemos a través de cartogramas las variables poblacionales del CENSO 2017
 
 ```{r message=FALSE, echo=FALSE, fig.cap=" Figura 1: Catogramas base CENSO 2017"}
-
-
 tmap_mode("view")
 tm_shape(D2017) +
   tm_polygons(c("HACI", "Pob_Viv", "MASCU", "ESC"), 
               id= "COMUNA") + 
   tm_facets(sync = TRUE, ncol = 2)
-
-
 ```
 
 
@@ -172,50 +147,350 @@ De la Figura 1, podemos notar que para las variables `HACI` (hacinamiento) y `Po
 Analicemos la existencia de autocorrelación espacial
 
 ```{r warning= FALSE, message=FALSE, echo=FALSE, include=FALSE}
-
 ## TEST
-
 m1 <- moran.test(D2017$HACI, b_pesos, zero.policy = TRUE)
 g1 <- geary.test(D2017$HACI, b_pesos, zero.policy = TRUE)
-
 m2 <- moran.test(D2017$Pob_Viv, b_pesos, zero.policy = TRUE)
 g2 <- geary.test(D2017$Pob_Viv, b_pesos, zero.policy = TRUE)
-
 m3 <- moran.test(D2017$MASCU, b_pesos, zero.policy = TRUE)
 g3 <- geary.test(D2017$MASCU, b_pesos, zero.policy = TRUE)
-
 m4 <- moran.test(D2017$ESC, b_pesos, zero.policy = TRUE)
 g4 <- geary.test(D2017$ESC, b_pesos, zero.policy = TRUE)
-
 ```
 
 
 ```{r, echo=FALSE}
-
 ## TABLAS
 a <- matrix(c(m1$estimate, m2$estimate,m3$estimate, m4$estimate), 4, 3, byrow = TRUE)
-
 b <- matrix(c(g1$estimate, g2$estimate, g3$estimate, g4$estimate), 4, 3, byrow = TRUE)
-
 data.frame(Variable= c("Hacinamiento", "Pob_Viv", "MASCU", "ESC") , Moran_I_statistic = a[,1], Expectation= a[, 2], Variance= a[, 3]  ) %>% 
   kbl(caption= "Tabla I: Test de Moran") %>%
   kable_classic("hover")
-
-
 data.frame(Variable= c("Hacinamiento", "Pob_Viv", "MASCU", "ESC") , Moran_I_statistic = b[,1], Expectation= b[, 2], Variance= b[, 3]  ) %>% 
   kbl(caption= "Tabla II: Test de Geary") %>%
   kable_classic("hover")
-
 ```
 
 
-De las tablas I y II, podemos desprender que para todas nuestras variables existe autocorrelaión espacial. 
+De las tablas I y II, podemos desprender que para todas nuestras variables existe autocorrelación espacial. 
 
+Ahora en cuanto a las variables de delitos, veremos una a una si existe algún tipo de autocorrelación espacial.
 
+### Violencia hacia la Mujer
+
+```{r warning= FALSE, message=FALSE, echo=FALSE}
+## ANIOS
+D2017_Del_2010 <- D2017_Del %>% 
+  filter(ANIO == 2010)
+
+D2017_Del_2011 <- D2017_Del %>% 
+  filter(ANIO == 2011)
+
+D2017_Del_2012 <- D2017_Del %>% 
+  filter(ANIO == 2012)
+
+D2017_Del_2013 <- D2017_Del %>% 
+  filter(ANIO == 2013)
+
+D2017_Del_2014 <- D2017_Del %>% 
+  filter(ANIO == 2014)
+
+D2017_Del_2015 <- D2017_Del %>% 
+  filter(ANIO == 2015)
+
+D2017_Del_2016 <- D2017_Del %>% 
+  filter(ANIO == 2016)
+
+D2017_Del_2017 <- D2017_Del %>% 
+  filter(ANIO == 2017)
+
+## VIO.MUJ
+
+m_1_2010 <- moran.test(D2017_Del_2010$VIO.MUJ, b_pesos, zero.policy = TRUE) 
+
+m_1_2011 <- moran.test(D2017_Del_2011$VIO.MUJ, b_pesos, zero.policy = TRUE) 
+
+m_1_2012 <- moran.test(D2017_Del_2012$VIO.MUJ, b_pesos, zero.policy = TRUE) # A 0.1
+
+m_1_2013 <- moran.test(D2017_Del_2013$VIO.MUJ, b_pesos, zero.policy = TRUE) 
+
+m_1_2014 <- moran.test(D2017_Del_2014$VIO.MUJ, b_pesos, zero.policy = TRUE) # A 0.1
+
+m_1_2015 <- moran.test(D2017_Del_2015$VIO.MUJ, b_pesos, zero.policy = TRUE) 
+
+m_1_2016 <- moran.test(D2017_Del_2016$VIO.MUJ, b_pesos, zero.policy = TRUE) 
+
+m_1_2017 <- moran.test(D2017_Del_2017$VIO.MUJ, b_pesos, zero.policy = TRUE) 
+
+VIO_MUJ <- data.frame(Anio = 2010:2017, 
+           Moran_I = matrix(c(m_1_2010$estimate[1], 
+                                                m_1_2011$estimate[1],
+                                                m_1_2012$estimate[1], 
+                                                m_1_2013$estimate[1],
+                                                m_1_2014$estimate[1],
+                                                m_1_2015$estimate[1],
+                                                m_1_2016$estimate[1],
+                                                m_1_2017$estimate[1]), ncol = 1, byrow = TRUE),
+           p_value = matrix(c(m_1_2010$p.value, 
+                              m_1_2011$p.value,
+                              m_1_2012$p.value, 
+                              m_1_2013$p.value,
+                              m_1_2014$p.value,
+                              m_1_2015$p.value,
+                              m_1_2016$p.value,
+                              m_1_2017$p.value), ncol = 1, byrow = TRUE))
+
+# SIN GEARY
+VIO_MUJ <- VIO_MUJ %>% 
+  mutate(autocorr = ifelse(p_value<=0.1, "SI", "NO"))
+
+VIO_MUJ %>% 
+  kbl(caption= "Tabla III: Test de Moran para VIO.MUJ") %>%
+  kable_classic("hover")
+```
+
+Podemos ver en la tabla III que solo para dos años observamos autocorrelación espacial.
+
+### Violencia hacia Niños
+
+```{r warning= FALSE, message=FALSE, echo=FALSE}
+m_2_2010 <- moran.test(D2017_Del_2010$VIO.NIN, b_pesos, zero.policy = TRUE) 
+
+m_2_2011 <- moran.test(D2017_Del_2011$VIO.NIN, b_pesos, zero.policy = TRUE) 
+
+m_2_2012 <- moran.test(D2017_Del_2012$VIO.NIN, b_pesos, zero.policy = TRUE) # A 0.1
+
+m_2_2013 <- moran.test(D2017_Del_2013$VIO.NIN, b_pesos, zero.policy = TRUE) # A 0.1
+
+m_2_2014 <- moran.test(D2017_Del_2014$VIO.NIN, b_pesos, zero.policy = TRUE) # A 0.1
+
+m_2_2015 <- moran.test(D2017_Del_2015$VIO.NIN, b_pesos, zero.policy = TRUE) 
+
+m_2_2016 <- moran.test(D2017_Del_2016$VIO.NIN, b_pesos, zero.policy = TRUE) 
+
+m_2_2017 <- moran.test(D2017_Del_2017$VIO.NIN, b_pesos, zero.policy = TRUE) 
+
+VIO_NIN <- data.frame(Anio = 2010:2017, 
+                      Moran_I = matrix(c(m_2_2010$estimate[1], 
+                                         m_2_2011$estimate[1],
+                                         m_2_2012$estimate[1], 
+                                         m_2_2013$estimate[1],
+                                         m_2_2014$estimate[1],
+                                         m_2_2015$estimate[1],
+                                         m_2_2016$estimate[1],
+                                         m_2_2017$estimate[1]), ncol = 1, byrow = TRUE),
+                      p_value = matrix(c(m_2_2010$p.value, 
+                                         m_2_2011$p.value,
+                                         m_2_2012$p.value, 
+                                         m_2_2013$p.value,
+                                         m_2_2014$p.value,
+                                         m_2_2015$p.value,
+                                         m_2_2016$p.value,
+                                         m_2_2017$p.value), ncol = 1, byrow = TRUE))
+
+# SIN GEARY
+VIO_NIN <- VIO_NIN %>% 
+  mutate(autocorr = ifelse(p_value<=0.1, "SI", "NO"))
+
+VIO_NIN %>% 
+  kbl(caption= "Tabla IV: Test de Moran para VIO.NIN") %>%
+  kable_classic("hover")
+```
+
+Podemos ver en la tabla IV que solo para dos años observamos autocorrelación espacial.
+
+### Violencia hacia Adultos Mayores
+
+```{r warning= FALSE, message=FALSE, echo=FALSE}
+m_3_2010 <- moran.test(D2017_Del_2010$VIO.ADULT, b_pesos, zero.policy = TRUE) 
+
+m_3_2011 <- moran.test(D2017_Del_2011$VIO.ADULT, b_pesos, zero.policy = TRUE) 
+
+m_3_2012 <- moran.test(D2017_Del_2012$VIO.ADULT, b_pesos, zero.policy = TRUE) # A 0.1
+
+m_3_2013 <- moran.test(D2017_Del_2013$VIO.ADULT, b_pesos, zero.policy = TRUE) # A 0.1
+
+m_3_2014 <- moran.test(D2017_Del_2014$VIO.ADULT, b_pesos, zero.policy = TRUE) # A 0.1
+
+m_3_2015 <- moran.test(D2017_Del_2015$VIO.ADULT, b_pesos, zero.policy = TRUE) 
+
+m_3_2016 <- moran.test(D2017_Del_2016$VIO.ADULT, b_pesos, zero.policy = TRUE) 
+
+m_3_2017 <- moran.test(D2017_Del_2017$VIO.ADULT, b_pesos, zero.policy = TRUE) 
+
+VIO_ADULT <- data.frame(Anio = 2010:2017, 
+                      Moran_I = matrix(c(m_3_2010$estimate[1], 
+                                         m_3_2011$estimate[1],
+                                         m_3_2012$estimate[1], 
+                                         m_3_2013$estimate[1],
+                                         m_3_2014$estimate[1],
+                                         m_3_2015$estimate[1],
+                                         m_3_2016$estimate[1],
+                                         m_3_2017$estimate[1]), ncol = 1, byrow = TRUE),
+                      p_value = matrix(c(m_3_2010$p.value, 
+                                         m_3_2011$p.value,
+                                         m_3_2012$p.value, 
+                                         m_3_2013$p.value,
+                                         m_3_2014$p.value,
+                                         m_3_2015$p.value,
+                                         m_3_2016$p.value,
+                                         m_3_2017$p.value), ncol = 1, byrow = TRUE))
+
+# SIN GEARY
+VIO_ADULT <- VIO_ADULT %>% 
+  mutate(autocorr = ifelse(p_value<=0.1, "SI", "NO"))
+
+VIO_ADULT %>% 
+  kbl(caption= "Tabla V: Test de Moran para VIO.ADULT") %>%
+  kable_classic("hover")
+```
+
+Podemos ver en la tabla V que la variable `VIO.ADULT` presenta autocorrelación espacial para todos los años que se observó.
+
+### Consumo de Alcohol en la vía pública
+
+```{r warning= FALSE, message=FALSE, echo=FALSE}
+m_4_2010 <- moran.test(D2017_Del_2010$ALCOHOL, b_pesos, zero.policy = TRUE) 
+
+m_4_2011 <- moran.test(D2017_Del_2011$ALCOHOL, b_pesos, zero.policy = TRUE) 
+
+m_4_2012 <- moran.test(D2017_Del_2012$ALCOHOL, b_pesos, zero.policy = TRUE) 
+
+m_4_2013 <- moran.test(D2017_Del_2013$ALCOHOL, b_pesos, zero.policy = TRUE)
+
+m_4_2014 <- moran.test(D2017_Del_2014$ALCOHOL, b_pesos, zero.policy = TRUE)
+
+m_4_2015 <- moran.test(D2017_Del_2015$ALCOHOL, b_pesos, zero.policy = TRUE) 
+
+m_4_2016 <- moran.test(D2017_Del_2016$ALCOHOL, b_pesos, zero.policy = TRUE) 
+
+m_4_2017 <- moran.test(D2017_Del_2017$ALCOHOL, b_pesos, zero.policy = TRUE) 
+
+ALCOHOL <- data.frame(Anio = 2010:2017, 
+                        Moran_I = matrix(c(m_4_2010$estimate[1], 
+                                           m_4_2011$estimate[1],
+                                           m_4_2012$estimate[1], 
+                                           m_4_2013$estimate[1],
+                                           m_4_2014$estimate[1],
+                                           m_4_2015$estimate[1],
+                                           m_4_2016$estimate[1],
+                                           m_4_2017$estimate[1]), ncol = 1, byrow = TRUE),
+                        p_value = matrix(c(m_4_2010$p.value, 
+                                           m_4_2011$p.value,
+                                           m_4_2012$p.value, 
+                                           m_4_2013$p.value,
+                                           m_4_2014$p.value,
+                                           m_4_2015$p.value,
+                                           m_4_2016$p.value,
+                                           m_4_2017$p.value), ncol = 1, byrow = TRUE))
+
+# SIN GEARY
+ALCOHOL <- ALCOHOL %>% 
+  mutate(autocorr = ifelse(p_value<=0.1, "SI", "NO"))
+
+ALCOHOL %>% 
+  kbl(caption= "Tabla VI: Test de Moran para ALCOHOL") %>%
+  kable_classic("hover")
+```
+
+Podemos ver en la tabla VI que la variable `ALCOHOL` presenta autocorrelación espacial para 6 de los 8 años.
+
+### Abuso Sexual
+
+```{r warning= FALSE, message=FALSE, echo=FALSE}
+m_5_2010 <- moran.test(D2017_Del_2010$ABUSO, b_pesos, zero.policy = TRUE) 
+
+m_5_2011 <- moran.test(D2017_Del_2011$ABUSO, b_pesos, zero.policy = TRUE) 
+
+m_5_2012 <- moran.test(D2017_Del_2012$ABUSO, b_pesos, zero.policy = TRUE) 
+
+m_5_2013 <- moran.test(D2017_Del_2013$ABUSO, b_pesos, zero.policy = TRUE)
+
+m_5_2014 <- moran.test(D2017_Del_2014$ABUSO, b_pesos, zero.policy = TRUE)
+
+m_5_2015 <- moran.test(D2017_Del_2015$ABUSO, b_pesos, zero.policy = TRUE) 
+
+m_5_2016 <- moran.test(D2017_Del_2016$ABUSO, b_pesos, zero.policy = TRUE) 
+
+m_5_2017 <- moran.test(D2017_Del_2017$ABUSO, b_pesos, zero.policy = TRUE) 
+
+ABUSO <- data.frame(Anio = 2010:2017, 
+                      Moran_I = matrix(c(m_5_2010$estimate[1], 
+                                         m_5_2011$estimate[1],
+                                         m_5_2012$estimate[1], 
+                                         m_5_2013$estimate[1],
+                                         m_5_2014$estimate[1],
+                                         m_5_2015$estimate[1],
+                                         m_5_2016$estimate[1],
+                                         m_5_2017$estimate[1]), ncol = 1, byrow = TRUE),
+                      p_value = matrix(c(m_5_2010$p.value, 
+                                         m_5_2011$p.value,
+                                         m_5_2012$p.value, 
+                                         m_5_2013$p.value,
+                                         m_5_2014$p.value,
+                                         m_5_2015$p.value,
+                                         m_5_2016$p.value,
+                                         m_5_2017$p.value), ncol = 1, byrow = TRUE))
+
+# SIN GEARY
+ABUSO <- ABUSO %>% 
+  mutate(autocorr = ifelse(p_value<=0.1, "SI", "NO"))
+
+ABUSO %>% 
+  kbl(caption= "Tabla VII: Test de Moran para ABUSO") %>%
+  kable_classic("hover")
+```
+
+Podemos ver en la tabla VII que la variable `ABUSO` presenta autocorrelación espacial sólo para 1 año.
+
+### Ruidos Molestos
+
+```{r warning= FALSE, message=FALSE, echo=FALSE}
+m_6_2010 <- moran.test(D2017_Del_2010$RUIDO, b_pesos, zero.policy = TRUE) 
+
+m_6_2011 <- moran.test(D2017_Del_2011$RUIDO, b_pesos, zero.policy = TRUE) 
+
+m_6_2012 <- moran.test(D2017_Del_2012$RUIDO, b_pesos, zero.policy = TRUE) 
+
+m_6_2013 <- moran.test(D2017_Del_2013$RUIDO, b_pesos, zero.policy = TRUE)
+
+m_6_2014 <- moran.test(D2017_Del_2014$RUIDO, b_pesos, zero.policy = TRUE)
+
+m_6_2015 <- moran.test(D2017_Del_2015$RUIDO, b_pesos, zero.policy = TRUE) 
+
+m_6_2016 <- moran.test(D2017_Del_2016$RUIDO, b_pesos, zero.policy = TRUE) 
+
+m_6_2017 <- moran.test(D2017_Del_2017$RUIDO, b_pesos, zero.policy = TRUE) 
+
+RUIDO <- data.frame(Anio = 2010:2017, 
+                    Moran_I = matrix(c(m_6_2010$estimate[1], 
+                                       m_6_2011$estimate[1],
+                                       m_6_2012$estimate[1], 
+                                       m_6_2013$estimate[1],
+                                       m_6_2014$estimate[1],
+                                       m_6_2015$estimate[1],
+                                       m_6_2016$estimate[1],
+                                       m_6_2017$estimate[1]), ncol = 1, byrow = TRUE),
+                    p_value = matrix(c(m_6_2010$p.value, 
+                                       m_6_2011$p.value,
+                                       m_6_2012$p.value, 
+                                       m_6_2013$p.value,
+                                       m_6_2014$p.value,
+                                       m_6_2015$p.value,
+                                       m_6_2016$p.value,
+                                       m_6_2017$p.value), ncol = 1, byrow = TRUE))
+
+# SIN GEARY
+RUIDO <- RUIDO %>% 
+  mutate(autocorr = ifelse(p_value<=0.1, "SI", "NO"))
+
+RUIDO %>% 
+  kbl(caption= "Tabla VIII: Test de Moran para RUIDO") %>%
+  kable_classic("hover")
+```
+
+Podemos ver en la tabla VIII que la variable `RUIDO` no presenta autocorrelación espacial en ninguno de los años observados.
 
 # Conclusión
 
 # Referencias
-
-
-
