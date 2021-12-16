@@ -69,14 +69,12 @@ Table: Tabla II: Descripción de variables CENSO 2017 RM.
 | ESC | Numérica | Años de escolaridad promedio del jefe o jefa de hogar|
 
 
-Adiionalmete para la base CENSO 2017, se generó una nueva variables ´Pob_Viv´ que resume la población y la cantidad de viviendas de la comuna. 
+Adicionalmete para la base CENSO 2017, se generó una nueva variables ´Pob_Viv´ que resume la población y la cantidad de viviendas de la comuna. 
 
 
-Iniciaremos nuestra investigación realizando un análisis previo mediante visualizaciones para observar posibles patrones, asociaciones y correlaciones a través de corrplots, variogramas, correlogramas y gráficas de dispersión, además de usar diversos test de asociación espacial. 
+Iniciaremos nuestra investigación realizando un análisis previo mediante visualizaciones para observar posibles patrones, asociaciones y correlaciones a través de cartogramas y corrplots, además de usar diversos test de asociación espacial. 
 
-Posteriormente, construiremos modelos espacio temporales para datos de área (CARBayes), revisaremos a través de clusters algo JALDKJ y relizaremos predicciones espaciales (kriging)
-
-Será necesario poner librerias???
+Posteriormente, construiremos modelos lineales, CAR y SAR para cada una de las variables de Delitos. Las cuales serán construidas con diferentes variables, en donde identificaremos si es que existe alguna incidencia con nuestra poblacional.
 
 
 ```{r echo = FALSE, warning= FALSE, message=FALSE, include=FALSE}
@@ -559,7 +557,7 @@ Podemos ver en la tabla VIII que la variable `RUIDO` no presenta autocorrelació
 
 Ahora veamos la correlación de los datos a través de un corrplot ¿Qué tan relacionadas linealmente estarán nuestras variables?
 
-```{r , fig.align="center", fig.cap= "Figura 2: Corrplot"}
+```{r , fig.align="center", fig.cap= "Figura 8: Corrplot"}
 knitr::include_graphics(here::here("Informe","Corrplot.png"))
 ```
 
@@ -788,7 +786,7 @@ AIC_RUIDO <- data.frame(Modelo = c("Lineal Completo", "Lineal ESC",
                                   AIC(mod_SAR),
                                   AIC(mod_SAR2)))
 
-AIC_ABUSO %>% 
+AIC_RUIDO %>% 
   kbl(caption= "Tabla XIV: AIC Modelos RUIDO") %>%
   kable_classic("hover")
 ```
@@ -797,5 +795,10 @@ AIC_ABUSO %>%
 Para el delito de ruidos molestos el mejor modelo es el CAR con la variable MASCU + ESC. Por lo que no estaría incidiendo en este delito los niveles de hacinamiento o la cantidad de habitantes por vivienda. Pero sí la cantidad de hombres en la comuna, además del nivel de educación de los jefes o jefas de hogar.
 
 # Conclusión
+
+
+
+
+
 
 # Referencias
