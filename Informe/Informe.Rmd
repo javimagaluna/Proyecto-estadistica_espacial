@@ -20,6 +20,7 @@ thumbnails: FALSE
 library(knitr)
 library(rmdformats)
 library(here)
+library(kableExtra)
 
 ```
 
@@ -70,14 +71,15 @@ Table: Tabla II: Descripción de variables CENSO 2017 RM.
 | ESC | Numérica | Años de escolaridad promedio del jefe o jefa de hogar|
 
 
+Adiionalmete para la base CENSO 2017, se generó una nueva variables ´Pob_Viv´ que resume la población y la cantidad de viviendas de la comuna. 
+
+
 Iniciaremos nuestra investigación realizando un análisis previo mediante visualizaciones para observar posibles patrones, asociaciones y correlaciones a través de corrplots, variogramas, correlogramas y gráficas de dispersión, además de usar diversos test de asociación espacial. 
 
 Posteriormente, construiremos modelos espacio temporales para datos de área (CARBayes), revisaremos a través de clusters algo JALDKJ y relizaremos predicciones espaciales (kriging)
 
 Será necesario poner librerias???
 
-
-# Análisis Previo
 
 ```{r echo = FALSE, warning= FALSE, message=FALSE, include=FALSE}
 # Librerías ---------------------------------------------------------------
@@ -144,88 +146,72 @@ ver_b_pesos <- listw2mat(b_pesos)
 ver_w_pesos <- listw2mat(w_pesos)
 ```
 
-## Variable Hacinamiento
-
-Tanto el test de Moran como el Geary nos dicen que existe autocorrelación espacial.
-
-```{r warning= FALSE, message=FALSE, echo=FALSE}
-moran.test(D2017$HACI, b_pesos, zero.policy = TRUE)
-geary.test(D2017$HACI, b_pesos, zero.policy = TRUE)
 
 
-mapview::mapview(D2017["HACI"],
-                 layer.name = "% Hacinamiento",
-                 legend = TRUE,
-                 popup = paste0(
-                   "<b>COMUNA: </b>"
-                   , D2017$COMUNA
-                   , "<br><b>% Hacinamiento: </b>"
-                   , D2017$HACI
-                 ))
-```
+# Análisis y Resultados
 
-## Variable Pob_Viv
+Para tener una panorámica de la situación, observemos a través de cartogramas las variables poblacionales del CENSO 2017
 
-Se generó una nueva variables ´Pob_Viv´ que resume la población y la cantidad de viviendas
-de la comuna. Para esta variable tanto el test de Moran como el Geary nos dicen que existe autocorrelación espacial.
+```{r message=FALSE, echo=FALSE, fig.cap=" Figura 1: Catogramas base CENSO 2017"}
 
-```{r warning= FALSE, message=FALSE, echo=FALSE}
-### Indice Pob_Viv
-moran.test(D2017$Pob_Viv, b_pesos, zero.policy = TRUE)
-geary.test(D2017$Pob_Viv, b_pesos, zero.policy = TRUE)
-mapview::mapview(D2017["Pob_Viv"],
-                 layer.name = "Hab por Viv",
-                 legend = TRUE,
-                 popup = paste0(
-                   "<b>COMUNA: </b>"
-                   , D2017$COMUNA
-                   , "<br><b>% Hab/Viv: </b>"
-                   , D2017$Pob_Viv
-                 ))
-```
 
-## Variable MASCU
+tmap_mode("view")
+tm_shape(D2017) +
+  tm_polygons(c("HACI", "Pob_Viv", "MASCU", "ESC"), 
+              id= "COMUNA") + 
+  tm_facets(sync = TRUE, ncol = 2)
 
-Tanto el test de Moran como el Geary nos dicen que existe autocorrelación espacial.
-
-```{r warning= FALSE, message=FALSE, echo=FALSE}
-moran.test(D2017$MASCU, b_pesos, zero.policy = TRUE)
-geary.test(D2017$MASCU, b_pesos, zero.policy = TRUE)
-mapview::mapview(D2017["MASCU"],
-                 layer.name = "Índice Masculinidad",
-                 legend = TRUE,
-                 popup = paste0(
-                   "<b>COMUNA: </b>"
-                   , D2017$COMUNA
-                   , "<br><b>Índice Masculinidad: </b>"
-                   , D2017$Pob_Viv
-                 ))
-```
-
-## Variable ESC
-
-Tanto el test de Moran como el Geary nos dicen que existe autocorrelación espacial.
-
-```{r warning= FALSE, message=FALSE, echo=FALSE}
-moran.test(D2017$ESC, b_pesos, zero.policy = TRUE)
-geary.test(D2017$ESC, b_pesos, zero.policy = TRUE)
-mapview::mapview(D2017["ESC"],
-                 layer.name = "Escolaridad",
-                 legend = TRUE,
-                 popup = paste0(
-                   "<b>COMUNA: </b>"
-                   , D2017$COMUNA
-                   , "<br><b>Escolaridad: </b>"
-                   , D2017$Pob_Viv
-                 ))
 
 ```
 
-## En general
 
-Todas las variables comunales de la base CENSO 2017 tienen autocorrelación espacial.
 
-# Resultados 
+
+De la Figura 1, podemos notar que para las variables `HACI` (hacinamiento) y `Pov_Viv` poseen una mayor condensación en el centro de las comunas de la región metropolitana. Notemos que para la variable `MASCU` (hombres cada 100 mujeres) existe una mayor tasa en comunas rurales.
+
+Analicemos la existencia de autocorrelación espacial
+
+```{r warning= FALSE, message=FALSE, echo=FALSE, include=FALSE}
+
+## TEST
+
+m1 <- moran.test(D2017$HACI, b_pesos, zero.policy = TRUE)
+g1 <- geary.test(D2017$HACI, b_pesos, zero.policy = TRUE)
+
+m2 <- moran.test(D2017$Pob_Viv, b_pesos, zero.policy = TRUE)
+g2 <- geary.test(D2017$Pob_Viv, b_pesos, zero.policy = TRUE)
+
+m3 <- moran.test(D2017$MASCU, b_pesos, zero.policy = TRUE)
+g3 <- geary.test(D2017$MASCU, b_pesos, zero.policy = TRUE)
+
+m4 <- moran.test(D2017$ESC, b_pesos, zero.policy = TRUE)
+g4 <- geary.test(D2017$ESC, b_pesos, zero.policy = TRUE)
+
+```
+
+
+```{r, echo=FALSE}
+
+## TABLAS
+a <- matrix(c(m1$estimate, m2$estimate,m3$estimate, m4$estimate), 4, 3, byrow = TRUE)
+
+b <- matrix(c(g1$estimate, g2$estimate, g3$estimate, g4$estimate), 4, 3, byrow = TRUE)
+
+data.frame(Variable= c("Hacinamiento", "Pob_Viv", "MASCU", "ESC") , Moran_I_statistic = a[,1], Expectation= a[, 2], Variance= a[, 3]  ) %>% 
+  kbl(caption= "Tabla I: Test de Moran") %>%
+  kable_classic("hover")
+
+
+data.frame(Variable= c("Hacinamiento", "Pob_Viv", "MASCU", "ESC") , Moran_I_statistic = b[,1], Expectation= b[, 2], Variance= b[, 3]  ) %>% 
+  kbl(caption= "Tabla II: Test de Geary") %>%
+  kable_classic("hover")
+
+```
+
+
+De las tablas I y II, podemos desprender que para todas nuestras variables existe autocorrelaión espacial. 
+
+
 
 # Conclusión
 
