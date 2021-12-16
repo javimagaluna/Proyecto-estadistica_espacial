@@ -6,3 +6,5 @@
 `Densidad_Viviendas_Santiago_2016.csv`: Densidad de viviendas en la región metropolitana pre censo 2016 [INE](https://ideocuc-ocuc.hub.arcgis.com/datasets/3d3952849a4e4f09b7110a01cf3a4d12_0/about)
 
 `Indicadores_Territoriales.csv`: Densidad de viviendas en la región metropolitana censo 2017 [INE](https://geoine-ine-chile.opendata.arcgis.com/datasets/4de21bbed6e94b6ead48cf83d88fcac9_22/explore?location=-33.863431%2C-71.678500%2C4.79&showTable=true)
+
+`Pob2017.csv`: Datos extraídos del CENSO 2017 [INE](http://resultados.censo2017.cl/Region?R=R13)
