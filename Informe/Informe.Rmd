@@ -491,6 +491,57 @@ RUIDO %>%
 
 Podemos ver en la tabla VIII que la variable `RUIDO` no presenta autocorrelación espacial en ninguno de los años observados.
 
+## Modelos
+
+### Modelo Violencia Adulto Mayor
+
+Se propuso el modelo completo con las variables comunales HACI, MASCU, ESCU y Pob_Viv. Y luego se fueron eliminando variables teniendo presente la significancia que tenían en el modelo completo y usando como criterio de eliminación el AIC.
+
+```{r warning= FALSE, message=FALSE, echo=FALSE}
+# Defino los vecinos
+vecinos2 <- poly2nb(D2017_Del)
+
+# Hago las matrices de pesos
+b_pesos2 <- nb2listw(vecinos2, style ="B", zero.policy = TRUE)
+w_pesos2 <- nb2listw(vecinos2, style ="W", zero.policy = TRUE)
+
+ver_b_pesos2 <- listw2mat(b_pesos2)
+ver_w_pesos2 <- listw2mat(w_pesos2)
+
+## MODELO LINEAL
+mod_lin <- lm(VIO.ADULT ~ HACI + MASCU + ESC + Pob_Viv, data = D2017_Del)
+
+mod_lin_2 <- lm(VIO.ADULT ~ HACI + MASCU, data = D2017_Del)
+
+## MODELO CAR
+
+mod_CAR <- spautolm(VIO.ADULT ~ HACI + MASCU + ESC + Pob_Viv, data = D2017_Del, listw = b_pesos2, family = "CAR")
+
+mod_CAR_2 <- spautolm(VIO.ADULT ~ MASCU + ESC, data = D2017_Del, listw = b_pesos2, family = "CAR")
+
+## MODELO SAR
+
+mod_SAR <- spautolm(VIO.ADULT ~ HACI + MASCU + ESC + Pob_Viv, data = D2017_Del, listw = b_pesos2, family = "SAR")
+
+mod_SAR_2 <- spautolm(VIO.ADULT ~ MASCU + ESC, data = D2017_Del, listw = b_pesos2, family = "SAR")
+
+AIC_ADULT <- data.frame(Modelo = c("Lineal Completo", "Lineal HACI + MASCU",
+                                   "CAR Completo", "CAR MASCU + ESC",
+                                   "SAR Completo", "SAR MASCU + ESC"),
+                        AIC = c(AIC(mod_lin),
+                                AIC(mod_lin_2),
+                                AIC(mod_CAR),
+                                AIC(mod_CAR_2),
+                                AIC(mod_SAR),
+                                AIC(mod_SAR_2)))
+
+AIC_ADULT %>% 
+  kbl(caption= "Tabla IX: AIC Modelos VIO.ADULT") %>%
+  kable_classic("hover")
+```
+
+Para el delito de violencia hacia adulto mayor el mejor modelo es el CAR con las variables MASCU y ESC. Por lo que no estaría incidiendo en este delito los niveles de hacinamiento o la cantidad de habitantes por vivienda. Pero sí la cantidad de hombres en la comuna y el nivel de escolaridad de los jefes o jefas de hogar.
+
 # Conclusión
 
 # Referencias
