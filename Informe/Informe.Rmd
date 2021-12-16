@@ -174,7 +174,6 @@ data.frame(Variable= c("Hacinamiento", "Pob_Viv", "MASCU", "ESC") , Moran_I_stat
 
 De las tablas I y II, podemos desprender que para todas nuestras variables existe autocorrelación espacial. 
 
-----
 Ahora en cuanto a las variables de delitos, veremos una a una si existe algún tipo de autocorrelación espacial.
 
 ### Violencia hacia la Mujer
@@ -492,14 +491,24 @@ RUIDO %>%
 
 Podemos ver en la tabla VIII que la variable `RUIDO` no presenta autocorrelación espacial en ninguno de los años observados.
 
-----
+
+Ahora veamos la correlación de los datos a traves de un corrplot ¿Qué tan relacionadas linealmente estarán nuestras variables?
+
+```{r , fig.align="center", fig.cap= "Figura 2: Corrplot"}
+knitr::include_graphics(here::here("Informe","Corrplot.png"))
+```
+
+De la Figura 2, podemos notar que las variables `POB`,`VIV`, `ABUSO`, `VIO.MUJ` y `VIO.NIN` poseen una asociación muy alta. Podriamos decir que a medida que hay mayor población o viviendas, encontraremos una mayor cantidad de denuncias con respecto a la violencia y abuso.
+
+
 ## Modelos
 
-### Modelo Violencia Adulto Mayor
+Se propuso el modelo completo con las variables comunales HACI, MASCU, ESCU y Pob_Viv. Y luego se fueron eliminando variables teniendo presente la significancia que tenían en el modelo completo y usando como criterio de eliminación el AIC.
 
-Se propuso el modelo completo con las variables comunales HACI, MASCU, ESCU y Pob_Viv. Luego se fueron eliminando variables teniendo presente la significancia que tenían en el modelo completo y usando como criterio de eliminación el AIC.
+### Modelo Violencia hacia la Mujer
 
 ```{r warning= FALSE, message=FALSE, echo=FALSE}
+
 # Defino los vecinos
 vecinos2 <- poly2nb(D2017_Del)
 
@@ -510,6 +519,69 @@ w_pesos2 <- nb2listw(vecinos2, style ="W", zero.policy = TRUE)
 ver_b_pesos2 <- listw2mat(b_pesos2)
 ver_w_pesos2 <- listw2mat(w_pesos2)
 
+## MODELO LINEAL
+mod_lin <- lm(VIO.MUJ ~ HACI + MASCU + ESC + Pob_Viv, data = D2017_Del)
+
+mod_lin_2 <- lm(VIO.MUJ ~ MASCU + Pob_Viv, data = D2017_Del)
+
+## MODELO CAR
+
+mod_CAR <- spautolm(VIO.MUJ ~ MASCU + Pob_Viv, data = D2017_Del, listw = b_pesos2, family = "CAR")
+
+## MODELO SAR
+
+mod_SAR <- spautolm(VIO.MUJ ~ HACI + MASCU + ESC + Pob_Viv, data = D2017_Del, listw = b_pesos2, family = "SAR")
+
+AIC_MUJ <- data.frame(Modelo = c("Lineal Completo", "Lineal MASCU + Pob_Viv",
+                                   "CAR MASCU + Pob_Viv",
+                                   "SAR Completo"),
+                        AIC = c(AIC(mod_lin),
+                                AIC(mod_lin_2),
+                                AIC(mod_CAR),
+                                AIC(mod_SAR)))
+
+AIC_MUJ %>% 
+  kbl(caption= "Tabla IX: AIC Modelos VIO.MUJ") %>%
+  kable_classic("hover")
+```
+
+Para el delito de violencia hacia la mujer el mejor modelo es el CAR con las variables MASCU y Pob_Viv. Por lo que sí estaría incidiendo en este delito la cantidad de habitantes por vivienda Así como también la cantidad de hombres en la comuna.
+
+### Modelo Violencia hacia Niños
+
+```{r warning= FALSE, message=FALSE, echo=FALSE}
+
+## MODELO LINEAL
+mod_lin <- lm(VIO.NIN ~ HACI + MASCU + ESC + Pob_Viv, data = D2017_Del)
+
+mod_lin_2 <- lm(VIO.NIN ~ MASCU + Pob_Viv, data = D2017_Del)
+
+## MODELO CAR
+
+mod_CAR <- spautolm(VIO.NIN ~ HACI + MASCU + ESC + Pob_Viv, data = D2017_Del, listw = b_pesos2, family = "CAR")
+
+## MODELO SAR
+
+mod_SAR <- spautolm(VIO.NIN ~ HACI + MASCU + ESC + Pob_Viv, data = D2017_Del, listw = b_pesos2, family = "SAR")
+AIC_NIN<- data.frame(Modelo = c("Lineal Completo", "Lineal MASCU + Pob_Viv",
+                                   "CAR Completo",
+                                   "SAR Completo"),
+                        AIC = c(AIC(mod_lin),
+                                AIC(mod_lin_2),
+                                AIC(mod_CAR),
+                                AIC(mod_SAR)))
+
+AIC_NIN %>% 
+  kbl(caption= "Tabla X: AIC Modelos VIO.NIN") %>%
+  kable_classic("hover")
+```
+
+Para el delito de violencia hacia adulto mayor el mejor modelo es el CAR con todas las variables. Por lo que sí estaría incidiendo en este delito los niveles de hacinamiento y la cantidad de habitantes por vivienda. Además de la cantidad de hombres en la comuna y el nivel de escolaridad de los jefes o jefas de hogar.
+
+
+### Modelo Violencia hacia el Adulto Mayor
+
+```{r warning= FALSE, message=FALSE, echo=FALSE}
 ## MODELO LINEAL
 mod_lin <- lm(VIO.ADULT ~ HACI + MASCU + ESC + Pob_Viv, data = D2017_Del)
 
@@ -538,26 +610,125 @@ AIC_ADULT <- data.frame(Modelo = c("Lineal Completo", "Lineal HACI + MASCU",
                                 AIC(mod_SAR_2)))
 
 AIC_ADULT %>% 
-  kbl(caption= "Tabla IX: AIC Modelos VIO.ADULT") %>%
+  kbl(caption= "Tabla XI: AIC Modelos VIO.ADULT") %>%
   kable_classic("hover")
 ```
 
 Para el delito de violencia hacia adulto mayor el mejor modelo es el CAR con las variables MASCU y ESC. Por lo que no estaría incidiendo en este delito los niveles de hacinamiento o la cantidad de habitantes por vivienda. Pero sí la cantidad de hombres en la comuna y el nivel de escolaridad de los jefes o jefas de hogar.
 
-----
+### Modelo Alcohol
 
-Ahora veamos la correlación de los datos a traves de un corrplot ¿Qué tan relacionadas linealmente estarán nuestras variables?
+```{r warning= FALSE, message=FALSE, echo=FALSE}
+## MODELO LINEAL
+mod_lin <- lm(ALCOHOL ~ HACI + MASCU + ESC + Pob_Viv, data = D2017_Del)
 
-```{r , fig.align="center", fig.cap= "Figura 2: Corrplot"}
+mod_lin2 <- lm(ALCOHOL ~ HACI+ ESC + Pob_Viv, data = D2017_Del)
 
-knitr::include_graphics(here::here("Informe","Corrplot.png"))
+## MODELO CAR
 
+mod_CAR <- spautolm(ALCOHOL ~ HACI + MASCU + ESC + Pob_Viv, data = D2017_Del, listw = b_pesos2, family = "CAR")
+
+mod_CAR2 <- spautolm(ALCOHOL ~ HACI+ ESC + Pob_Viv, data = D2017_Del, listw = b_pesos2, family = "CAR")
+
+## MODELO SAR
+
+mod_SAR <- spautolm(ALCOHOL ~ HACI+ MASCU+ESC + Pob_Viv, data = D2017_Del, listw = b_pesos2, family = "SAR")
+
+mod_SAR2 <- spautolm(ALCOHOL ~ HACI+ ESC + Pob_Viv, data = D2017_Del, listw = b_pesos2, family = "SAR")
+
+AIC_ALCOHOL <- data.frame(Modelo = c("Lineal Completo", "Lineal HACI + ESC + Pob_Viv",
+                                   "CAR Completo", "CAR HACI+ ESC + Pob_Viv",
+                                   "SAR Completo", "SAR HACI+ ESC + Pob_Viv"),
+                        AIC = c(AIC(mod_lin),
+                                AIC(mod_lin2),
+                                AIC(mod_CAR),
+                                AIC(mod_CAR2),
+                                AIC(mod_SAR),
+                                AIC(mod_SAR2)))
+
+AIC_ALCOHOL %>% 
+  kbl(caption= "Tabla XII: AIC Modelos ALCOHOL") %>%
+  kable_classic("hover")
 ```
 
-De la Figura 2, podemos notar que las variables `POB`,`VIV`, `ABUSO`, `VIO.MUJ` y `VIO.NIN` poseen una asociación muy alta. Podriamos decir que a medida que hay mayor población o viviendas, encontraremos una mayor cantidad de denuncias con respecto a la violencia y abuso.
+Para el delito de beber alcohol en la vía pública el mejor modelo es el CAR con las variables HACI, ESC y Pob_Viv. Por lo que sí estaría incidiendo en este delito los niveles de hacinamiento o la cantidad de habitantes por vivienda. Además del nivel de escolaridad de los jefes o jefas de hogar.
 
 
+### Modelo Abuso Sexual
 
+```{r warning= FALSE, message=FALSE, echo=FALSE}
+## MODELO LINEAL
+mod_lin <- lm(ABUSO ~ HACI + ESC + Pob_Viv + MASCU, data = D2017_Del)
+
+mod_lin2 <- lm(ABUSO ~ HACI + ESC + Pob_Viv, data = D2017_Del)
+
+## MODELO CAR
+
+mod_CAR <- spautolm(ABUSO ~ HACI + ESC + Pob_Viv + MASCU, data = D2017_Del, listw = b_pesos2, family = "CAR")
+
+mod_CAR2 <- spautolm(ABUSO ~ Pob_Viv, data = D2017_Del, listw = b_pesos2, family = "CAR")
+
+## MODELO SAR
+
+mod_SAR <- spautolm(ABUSO ~ HACI + ESC + Pob_Viv, data = D2017_Del, listw = b_pesos2, family = "SAR")
+
+mod_SAR2 <- spautolm(ABUSO ~ ESC + Pob_Viv, data = D2017_Del, listw = b_pesos2, family = "SAR")
+
+AIC_ABUSO <- data.frame(Modelo = c("Lineal Completo", "Lineal HACI + ESC + Pob_Viv",
+                                   "CAR Completo", "CAR Pob_Viv",
+                                   "SAR Completo", "SAR ESC + Pob_Viv"),
+                        AIC = c(AIC(mod_lin),
+                                AIC(mod_lin2),
+                                AIC(mod_CAR),
+                                AIC(mod_CAR2),
+                                AIC(mod_SAR),
+                                AIC(mod_SAR2)))
+
+AIC_ABUSO %>% 
+  kbl(caption= "Tabla XIII: AIC Modelos ABUSO") %>%
+  kable_classic("hover")
+```
+
+
+Para el delito de abuso sexual el mejor modelo es el CAR con la variable Pob_Viv. Por lo que en este delito sí estaría incidiendo la cantidad de habitantes por vivienda.
+
+### Modelo Ruidos Molestos
+
+```{r warning= FALSE, message=FALSE, echo=FALSE}
+## MODELO LINEAL
+mod_lin <- lm(RUIDO ~ HACI + MASCU + ESC + Pob_Viv, data = D2017_Del)
+
+mod_lin2 <- lm(RUIDO ~ ESC, data = D2017_Del)
+
+## MODELO CAR
+
+mod_CAR <- spautolm(RUIDO ~ HACI + MASCU + ESC + Pob_Viv, data = D2017_Del, listw = b_pesos2, family = "CAR")
+
+mod_CAR2 <- spautolm(RUIDO ~ MASCU + ESC, data = D2017_Del, listw = b_pesos2, family = "CAR")
+
+## MODELO SAR
+
+mod_SAR <- spautolm(RUIDO ~ HACI + MASCU + ESC + Pob_Viv, data = D2017_Del, listw = b_pesos2, family = "SAR")
+
+mod_SAR2 <- spautolm(RUIDO ~ MASCU + ESC, data = D2017_Del, listw = b_pesos2, family = "SAR")
+
+AIC_RUIDO <- data.frame(Modelo = c("Lineal Completo", "Lineal ESC",
+                                     "CAR Completo", "CAR MASCU + ESC",
+                                     "SAR Completo", "SAR MASCU + ESC"),
+                          AIC = c(AIC(mod_lin),
+                                  AIC(mod_lin2),
+                                  AIC(mod_CAR),
+                                  AIC(mod_CAR2),
+                                  AIC(mod_SAR),
+                                  AIC(mod_SAR2)))
+
+AIC_ABUSO %>% 
+  kbl(caption= "Tabla XIV: AIC Modelos RUIDO") %>%
+  kable_classic("hover")
+```
+
+
+Para el delito de ruidos molestos el mejor modelo es el CAR con la variable MASCU + ESC. Por lo que no estaría incidiendo en este delito los niveles de hacinamiento o la cantidad de habitantes por vivienda. Pero sí la cantidad de hombres en la comuna, además del nivel de educación de los jefes o jefas de hogar.
 
 # Conclusión
 
