@@ -174,7 +174,71 @@ data.frame(Variable= c("Hacinamiento", "Pob_Viv", "MASCU", "ESC") , Moran_I_stat
 
 De las tablas I y II, podemos desprender que para todas nuestras variables existe autocorrelación espacial. 
 
-Ahora en cuanto a las variables de delitos, veremos una a una si existe algún tipo de autocorrelación espacial.
+----
+Al igual que para la base anterior, realizaremos cartogramas para nuestra base Delitos. Dado que tenemos información desde el año 2010 hasta el 2017, se presentan a continuación animaciones del avance tras pasan los años para cada uno de los delitos denunciados que estamos estudiando
+
+```{r , fig.align="center", fig.cap= "Figura 2: Cartograma denuncias abuso sexual", echo=FALSE}
+
+knitr::include_graphics(here::here("Informe","ABUSO.gif"))
+
+```
+
+
+De la Figura 2, podemos notar que para el año 2012 se presentan más comunas con denuncias de esta índole. Además, cabe destacar que las comunas: Puente Alto, Maipú y Santiago centro permanecen en color amarillo y poseen pocas variaciones a lo largo de los años.  
+
+
+
+```{r , fig.align="center", fig.cap= "Figura 3: Cartograma denuncias de consumo de alcohol en la vía pública", echo=FALSE}
+
+knitr::include_graphics(here::here("Informe","ALCOHOL.gif"))
+
+```
+
+De la Figura 3, podemos notar que la comuna de Santiago centro posee la mayor cantidad de denuncias por consumo de alcohol en la vía pública. Además, se observa un leve aumento en las comunas aledañas a Santiago centro tras pasar los años. 
+
+
+```{r , fig.align="center", fig.cap= "Figura 4: Cartograma denuncias de ruidos molestos", echo=FALSE}
+
+knitr::include_graphics(here::here("Informe","RUIDO.gif"))
+
+```
+
+
+De la Figura 4, podemos notar que las denuncias con respecto a ruidos molesto ha disminuido un poco a lo largo de los años, dejando a la comuna de Las Condes y Puente Alto como las con mayores denuncias.
+
+
+
+```{r , fig.align="center", fig.cap= "Figura 5: Cartograma de violencia hacia los niños y niñas", echo=FALSE}
+
+knitr::include_graphics(here::here("Informe","VIO.NIN.gif"))
+
+```
+
+
+Con respecto a las denuncias de violencia hacia niños y niñas, podemos notar en la Figura 5 que estas han disminuido un poco al pasar los años. Las comunas con más denuncias de esta índole son Puente Alto, San Bernardo y Maipú.
+
+
+```{r , fig.align="center", fig.cap= "Figura 6: Cartograma denuncias de violencia hacia la mujer", echo=FALSE}
+
+knitr::include_graphics(here::here("Informe","VIO.MUJ.gif"))
+
+```
+
+De la Figura 6, podemos notar que lamentablemente las denuncias por violencia hacia las mujeres se ha tenido una muy leve disminución al pasar los años.
+
+
+
+```{r , fig.align="center", fig.cap= "Figura 7: Cartograma de violencia hacia los adultos mayores", echo=FALSE}
+
+knitr::include_graphics(here::here("Informe","VIO.ADULT.gif"))
+
+```
+
+De la Figura 7, podemos observar que ha aumentando la cantidad de denuncias por violencia hacia los adultos mayores. Las comunas de Puente ALto y San Bernardo poseen una mayor cantidad de denuncias.
+
+
+
+Ahora bien, ¿Existirá algún tipo de autocorrelación espacial? Realicemos el análisis mediante el test de Moran y Geary para cada uno de estos años y variables:
 
 ### Violencia hacia la Mujer
 
@@ -491,15 +555,17 @@ RUIDO %>%
 
 Podemos ver en la tabla VIII que la variable `RUIDO` no presenta autocorrelación espacial en ninguno de los años observados.
 
+-----
 
-Ahora veamos la correlación de los datos a traves de un corrplot ¿Qué tan relacionadas linealmente estarán nuestras variables?
+Ahora veamos la correlación de los datos a través de un corrplot ¿Qué tan relacionadas linealmente estarán nuestras variables?
 
 ```{r , fig.align="center", fig.cap= "Figura 2: Corrplot"}
 knitr::include_graphics(here::here("Informe","Corrplot.png"))
 ```
 
-De la Figura 2, podemos notar que las variables `POB`,`VIV`, `ABUSO`, `VIO.MUJ` y `VIO.NIN` poseen una asociación muy alta. Podriamos decir que a medida que hay mayor población o viviendas, encontraremos una mayor cantidad de denuncias con respecto a la violencia y abuso.
+De la Figura 2, podemos notar que las variables `POB`,`VIV`, `ABUSO`, `VIO.MUJ` y `VIO.NIN` poseen una asociación muy alta. Podríamos decir que a medida que hay mayor población o viviendas, encontraremos una mayor cantidad de denuncias con respecto a la violencia y abuso.
 
+-----
 
 ## Modelos
 
