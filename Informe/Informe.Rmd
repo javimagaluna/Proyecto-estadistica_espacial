@@ -796,9 +796,22 @@ Para el delito de ruidos molestos el mejor modelo es el CAR con la variable MASC
 
 # Conclusión
 
+Tabla XV: Resumen incidencia de las variable comunales sobre los distintos delitos.
 
+|Modelo|Hacinamiento|Masculinidad|Escolaridad|Pob_Viv|
+|---|----|----|------|-----|
+|Violencia hacia la Mujer| |X| |X|
+|Violencia hacia los Niños|X|X|X|X|
+|Violencia hacia Adulto Mayor| |X|X| |
+|Consumo de Alcohol en vía pública|X| |X|X|
+|Abuso Sexual| | | |X|
+|Ruidos Molestos| |X|X| |
 
-
+En la tabla XV podemos ver a qué variable se asocia cada delito. En los delitos en los que toma gran importancia el hacinamiento y la cantidad de habitantes por vivienda una forma de tratar de evitar estos otros delitos podría ser mediante subsidios a la vivienda u otras medidas que faciliten el acceso a un espacio propio. En los delitos en los que es bien relevante  el nivel de educación del jefe o jefa de hogar es sumamente importante que se evite la deserción escolar y se fomente la continuidad de estudios. Finalmente, para delitos en los que el rol del alto índice de masculinidad comunal es importante nos parece más complejo de solucionar la búsqueda de un equilibrio en lo que a género se refiere. Creemos sumamente importante lograr interpretar esta variable más a fondo y comprender por qué este índice estaría "fomentando" estos delitos. 
 
 
 # Referencias
+
+Code for An Introduction to Spatial Analysis and Mapping in R 2nd edition
+Chris Brunsdon and Lex Comber
+https://bookdown.org/lexcomber/brunsdoncomber2e/calibrating-spatial-regression-models-in-r.html
