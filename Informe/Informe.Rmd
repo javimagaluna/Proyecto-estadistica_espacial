@@ -173,7 +173,7 @@ data.frame(Variable= c("Hacinamiento", "Pob_Viv", "MASCU", "ESC") , Moran_I_stat
 ```
 
 
-De las tablas I y II, podemos desprender que para todas nuestras variables existe autocorrelación espacial. 
+De las Tablas I y II, podemos desprender que para todas nuestras variables existe autocorrelación espacial. 
 
 ----
 Al igual que para la base anterior, realizaremos cartogramas para nuestra base Delitos. Dado que tenemos información desde el año 2010 hasta el 2017, se presentan a continuación animaciones del avance tras pasan los años para cada uno de los delitos denunciados que estamos estudiando
@@ -314,7 +314,7 @@ VIO_MUJ %>%
   kable_classic("hover")
 ```
 
-Podemos ver en la tabla III que solo para dos años observamos autocorrelación espacial.
+Podemos ver en la Tabla III que solo para dos años observamos autocorrelación espacial.
 
 ### Violencia hacia Niños
 
@@ -362,7 +362,7 @@ VIO_NIN %>%
   kable_classic("hover")
 ```
 
-Podemos ver en la tabla IV que solo para dos años observamos autocorrelación espacial.
+Podemos ver en la Tabla IV que solo para dos años observamos autocorrelación espacial.
 
 ### Violencia hacia Adultos Mayores
 
@@ -410,7 +410,7 @@ VIO_ADULT %>%
   kable_classic("hover")
 ```
 
-Podemos ver en la tabla V que la variable `VIO.ADULT` presenta autocorrelación espacial para todos los años que se observó.
+Podemos ver en la Tabla V que la variable `VIO.ADULT` presenta autocorrelación espacial para todos los años que se observó.
 
 ### Consumo de Alcohol en la vía pública
 
@@ -458,7 +458,7 @@ ALCOHOL %>%
   kable_classic("hover")
 ```
 
-Podemos ver en la tabla VI que la variable `ALCOHOL` presenta autocorrelación espacial para 6 de los 8 años.
+Podemos ver en la Tabla VI que la variable `ALCOHOL` presenta autocorrelación espacial para 6 de los 8 años.
 
 ### Abuso Sexual
 
@@ -506,7 +506,7 @@ ABUSO %>%
   kable_classic("hover")
 ```
 
-Podemos ver en la tabla VII que la variable `ABUSO` presenta autocorrelación espacial sólo para 1 año.
+Podemos ver en la Tabla VII que la variable `ABUSO` presenta autocorrelación espacial sólo para 1 año.
 
 ### Ruidos Molestos
 
@@ -554,17 +554,17 @@ RUIDO %>%
   kable_classic("hover")
 ```
 
-Podemos ver en la tabla VIII que la variable `RUIDO` no presenta autocorrelación espacial en ninguno de los años observados.
+Podemos ver en la Tabla VIII que la variable `RUIDO` no presenta autocorrelación espacial en ninguno de los años observados.
 
 -----
 
 Ahora veamos la correlación de los datos a través de un corrplot ¿Qué tan relacionadas linealmente estarán nuestras variables?
 
-```{r , fig.align="center", fig.cap= "Figura 8: Corrplot"}
+```{r , fig.align="center", fig.cap= "Figura 8: Corrplot", echo=FALSE}
 knitr::include_graphics(here::here("Informe","Corrplot.png"))
 ```
 
-De la Figura 2, podemos notar que las variables `POB`,`VIV`, `ABUSO`, `VIO.MUJ` y `VIO.NIN` poseen una asociación muy alta. Podríamos decir que a medida que hay mayor población o viviendas, encontraremos una mayor cantidad de denuncias con respecto a la violencia y abuso.
+De la Figura 8, podemos notar que las variables `POB`,`VIV`, `ABUSO`, `VIO.MUJ` y `VIO.NIN` poseen una asociación muy alta. Podríamos decir que a medida que hay mayor población o viviendas, encontraremos una mayor cantidad de denuncias con respecto a la violencia y abuso.
 
 -----
 
@@ -812,7 +812,7 @@ Tabla XV: Resumen incidencia de las variable comunales sobre los distintos delit
 |Abuso Sexual| | | |X|
 |Ruidos Molestos| |X|X| |
 
-En la tabla XV podemos ver a qué variable se asocia cada delito. En los delitos en los que toma gran importancia el hacinamiento y la cantidad de habitantes por vivienda una forma de tratar de evitar estos otros delitos podría ser mediante subsidios a la vivienda u otras medidas que faciliten el acceso a un espacio propio. En los delitos en los que es más relevante  el nivel de educación del jefe o jefa de hogar es sumamente importante que se evite la deserción escolar y se fomente la continuidad de estudios.
+En la Tabla XV podemos ver a qué variable se asocia cada delito. En los delitos en los que toma gran importancia el hacinamiento y la cantidad de habitantes por vivienda una forma de tratar de evitar estos otros delitos podría ser mediante subsidios a la vivienda u otras medidas que faciliten el acceso a un espacio propio. En los delitos en los que es más relevante  el nivel de educación del jefe o jefa de hogar, es sumamente importante que se evite la deserción escolar y se fomente la continuidad de estudios.
 Finalmente, para delitos en los que el rol del alto índice de masculinidad comunal es importante nos parece más complejo de solucionar la búsqueda de un equilibrio en lo que a género se refiere. Creemos sumamente importante lograr interpretar esta variable más a fondo y comprender por qué este índice estaría "fomentando" estos delitos. Es por esto que abrimos el debate sobre las medidas a tomar al respecto para avanzar como sociedad.
 
 
