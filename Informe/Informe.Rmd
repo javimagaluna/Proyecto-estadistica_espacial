@@ -24,11 +24,9 @@ library(kableExtra)
 
 # Resumen
 
-Mediante la exploración de datos y aplicaciones de diversos modelos, se evidenció una alta correlación positiva existente entre el número de habitantes, cantidad de viviendas, denuncias de abusos sexuales, violencia hacia la mujer y hacia los niños. Este resultado es coherente con nuestros modelos CAR alcanzados en donde para las denuncias de abuso sexual, consumo de alcohol en la vía pública, violencia  hacia los niños y hacia las mujeres está incidiendo la cantidad de habitantes por viviendas. 
-                                                      
-Además hemos alcanzado que el indice de masculinidad influye en las denuncias de violencia hacia la mujer, hacia los niños, hacia el adulto mayor y ruidos molestos. 
+Mediante la exploración de datos y aplicaciones de diversos modelos, se evidenció una alta correlación positiva existente entre el número de habitantes, cantidad de viviendas, denuncias de abusos sexuales, violencia hacia la mujer y hacia los niños. Este resultado es coherente con nuestros modelos CAR alcanzados en donde, para las mismas denuncias nombradas anteriormente, hay una incidencia con la cantidad de habitantes por vivienda. Además hemos alcanzado que el indice de masculinidad influye en las denuncias de violencia hacia la mujer, hacia los niños, hacia el adulto mayor y ruidos molestos. 
 
-A través de cartogramas hemos evidenciado el las denuncias desde el 2010 hasta el 2017, en donde ha aumentado la cantidad de denuncias por delitos de violencia hacia adultos mayores, en especial en comunas como Puente Alto y San Bernardo, lugares en que se deben proponer medidas de precaución ante el tema.
+A través de cartogramas hemos evidenciado los delitos desde el 2010 hasta el 2017, en donde ha aumentado la cantidad de denuncias por violencia hacia adultos mayores, en especial en comunas como Puente Alto y San Bernardo, lugares en que se deben proponer medidas de precaución ante el tema.
  
 
 # Introducción
